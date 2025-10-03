@@ -1,9 +1,5 @@
 package Estrutura;
 
-/**
- * Implementação de ArrayList personalizada para substituir java.util.ArrayList
- * Estrutura de dados baseada em array dinâmico
- */
 public class ArrayListCustom<T> implements ListInterface<T> {
     
     private static final int CAPACIDADE_INICIAL = 10;
@@ -12,19 +8,13 @@ public class ArrayListCustom<T> implements ListInterface<T> {
     private T[] elementos;
     private int tamanho;
     
-    /**
-     * Construtor padrão com capacidade inicial
-     */
     @SuppressWarnings("unchecked")
     public ArrayListCustom() {
         this.elementos = (T[]) new Object[CAPACIDADE_INICIAL];
         this.tamanho = 0;
     }
-    
-    /**
-     * Construtor com capacidade específica
-     * @param capacidadeInicial capacidade inicial do array
-     */
+  
+
     @SuppressWarnings("unchecked")
     public ArrayListCustom(int capacidadeInicial) {
         if (capacidadeInicial < 0) {
@@ -34,10 +24,6 @@ public class ArrayListCustom<T> implements ListInterface<T> {
         this.tamanho = 0;
     }
     
-    /**
-     * Construtor de cópia
-     * @param outraLista lista a ser copiada
-     */
     public ArrayListCustom(ListInterface<T> outraLista) {
         this(outraLista.size() + 5); // Um pouco mais de espaço
         for (int i = 0; i < outraLista.size(); i++) {
@@ -118,9 +104,6 @@ public class ArrayListCustom<T> implements ListInterface<T> {
         return -1;
     }
     
-    /**
-     * Garante que há capacidade suficiente no array
-     */
     @SuppressWarnings("unchecked")
     private void garantirCapacidade() {
         if (tamanho >= elementos.length) {
@@ -140,29 +123,16 @@ public class ArrayListCustom<T> implements ListInterface<T> {
         }
     }
     
-    /**
-     * Valida se o índice está dentro dos limites
-     * @param index índice a ser validado
-     * @throws IndexOutOfBoundsException se o índice for inválido
-     */
     private void validarIndice(int index) {
         if (index < 0 || index >= tamanho) {
             throw new IndexOutOfBoundsException("Índice: " + index + ", Tamanho: " + tamanho);
         }
     }
     
-    /**
-     * Retorna a capacidade atual do array interno
-     * @return capacidade atual
-     */
     public int getCapacidade() {
         return elementos.length;
     }
     
-    /**
-     * Converte a lista para um array
-     * @return array contendo todos os elementos da lista
-     */
     @SuppressWarnings("unchecked")
     public T[] toArray() {
         T[] array = (T[]) new Object[tamanho];
@@ -172,11 +142,6 @@ public class ArrayListCustom<T> implements ListInterface<T> {
         return array;
     }
     
-    /**
-     * Método auxiliar para converter lista de strings em string para join
-     * @param separador separador entre elementos
-     * @return string com elementos separados pelo separador
-     */
     public String join(String separador) {
         if (isEmpty()) {
             return "";
