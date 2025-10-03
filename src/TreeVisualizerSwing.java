@@ -124,6 +124,118 @@ public class TreeVisualizerSwing extends JFrame {
                 }
             }
         }
+        
+        // Método para buscar um caractere na árvore seguindo o código morse
+        public Node search(char character) {
+            String morseCode = getMorseCodeForChar(character);
+            if (morseCode == null) {
+                return null;
+            }
+            
+            System.out.println("Buscando caractere '" + character + "' com código morse: " + morseCode);
+            insertionPath.clear(); // Reutilizar para mostrar o caminho de busca
+            
+            return searchRecursive(root, morseCode, "");
+        }
+        
+        private Node searchRecursive(Node current, String remainingCode, String path) {
+            // Adiciona o caminho atual à lista para visualização
+            insertionPath.add(path);
+            
+            // Se chegamos ao fim do código morse, verificamos se encontramos o nó
+            if (remainingCode.isEmpty()) {
+                if (current != null && current.letter != ' ') {
+                    System.out.println("Caminho percorrido: " + path + " -> Caractere encontrado: '" + current.letter + "'");
+                    return current;
+                } else {
+                    System.out.println("Caminho percorrido: " + path + " -> Caractere não encontrado");
+                    return null;
+                }
+            }
+            
+            // Se o nó atual é null, o caractere não existe na árvore
+            if (current == null) {
+                System.out.println("Caminho " + path + " não existe na árvore");
+                return null;
+            }
+            
+            // Pega o primeiro caractere do código morse restante
+            char currentChar = remainingCode.charAt(0);
+            String remaining = remainingCode.substring(1);
+            
+            if (currentChar == '.') {
+                // Ponto vai para a esquerda
+                System.out.println("Seguindo caminho esquerda (.) - " + path + ".");
+                return searchRecursive(current.left, remaining, path + ".");
+            } else if (currentChar == '-') {
+                // Traço vai para a direita
+                System.out.println("Seguindo caminho direita (-) - " + path + "-");
+                return searchRecursive(current.right, remaining, path + "-");
+            }
+            
+            return null;
+        }
+        
+        // Método auxiliar para obter código morse de um caractere
+        private String getMorseCodeForChar(char character) {
+            String[][] morseTable = {
+                {"A", ".-"}, {"B", "-..."}, {"C", "-.-."}, {"D", "-.."}, {"E", "."},
+                {"F", "..-."}, {"G", "--."}, {"H", "...."}, {"I", ".."}, {"J", ".---"},
+                {"K", "-.-"}, {"L", ".-.."}, {"M", "--"}, {"N", "-."}, {"O", "---"},
+                {"P", ".--."}, {"Q", "--.-"}, {"R", ".-."}, {"S", "..."}, {"T", "-"},
+                {"U", "..-"}, {"V", "...-"}, {"W", ".--"}, {"X", "-..-"}, {"Y", "-.--"},
+                {"Z", "--.."}, {"0", "-----"}, {"1", ".----"}, {"2", "..---"}, 
+                {"3", "...--"}, {"4", "....-"}, {"5", "....."}, {"6", "-...."}, 
+                {"7", "--..."}, {"8", "---.."}, {"9", "----."}
+            };
+            
+            for (String[] entry : morseTable) {
+                if (entry[0].charAt(0) == character) {
+                    return entry[1];
+                }
+            }
+            return null;
+        }
+        
+        // Método para calcular a profundidade de um caractere
+        public int getDepth(char character) {
+            String morseCode = getMorseCodeForChar(character);
+            if (morseCode == null) {
+                return -1; // Caractere não suportado
+            }
+            
+            return getDepthRecursive(root, morseCode, 0);
+        }
+        
+        private int getDepthRecursive(Node current, String remainingCode, int currentDepth) {
+            // Se chegamos ao fim do código morse
+            if (remainingCode.isEmpty()) {
+                if (current != null && current.letter != ' ') {
+                    return currentDepth; // Encontrou o nó, retorna a profundidade
+                } else {
+                    return -1; // Nó não existe
+                }
+            }
+            
+            // Se o nó atual é null, o caractere não existe na árvore
+            if (current == null) {
+                return -1;
+            }
+            
+            // Pega o primeiro caractere do código morse restante
+            char currentChar = remainingCode.charAt(0);
+            String remaining = remainingCode.substring(1);
+            
+            if (currentChar == '.') {
+                // Ponto vai para a esquerda
+                return getDepthRecursive(current.left, remaining, currentDepth + 1);
+            } else if (currentChar == '-') {
+                // Traço vai para a direita
+                return getDepthRecursive(current.right, remaining, currentDepth + 1);
+            }
+            
+            return -1;
+        }
     }
     
     private class TreePanel extends JPanel {
