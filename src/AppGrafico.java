@@ -48,10 +48,10 @@ public class AppGrafico {
                     buscarCaractere();
                     break;
                 case 4:
-                    System.out.println("Funcionalidade ainda não implementada!");
+                    codificarPalavra();
                     break;
                 case 5:
-                    System.out.println("Funcionalidade ainda não implementada!");
+                    decodificarMorse();
                     break;
                 case 6:
                     running = false;
@@ -175,5 +175,87 @@ public class AppGrafico {
         
         System.out.println("Pressione Enter para continuar...");
         scanner.nextLine();
+    }
+    
+    private static void codificarPalavra() {
+        System.out.print("Digite a palavra para codificar (ex: JK): ");
+        String palavra = scanner.nextLine().toUpperCase();
+        
+        if (palavra.trim().isEmpty()) {
+            System.out.println("Por favor, digite uma palavra válida!");
+            return;
+        }
+        
+        System.out.println("\n=== CODIFICAÇÃO ===");
+        System.out.println("Entrada: " + palavra);
+        System.out.print("Código Morse: ");
+        
+        StringBuilder resultado = new StringBuilder();
+        
+        for (int i = 0; i < palavra.length(); i++) {
+            char letra = palavra.charAt(i);
+            String morse = getMorseCode(letra);
+            
+            if (morse != null) {
+                resultado.append(morse);
+                if (i < palavra.length() - 1) {
+                    resultado.append(" ");
+                }
+                System.out.print(morse);
+                if (i < palavra.length() - 1) {
+                    System.out.print(" ");
+                }
+            } else {
+                System.out.print("?");
+                resultado.append("?");
+            }
+        }
+        
+        System.out.println();
+        System.out.println("Resultado completo: " + resultado.toString());
+        System.out.println("Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+    
+    private static void decodificarMorse() {
+        System.out.println("Digite o código morse para decodificar:");
+        System.out.println("(Separe cada código por espaço, ex: .--- -.- )");
+        System.out.print("Código: ");
+        String codigoMorse = scanner.nextLine().trim();
+        
+        if (codigoMorse.isEmpty()) {
+            System.out.println("Por favor, digite um código morse válido!");
+            return;
+        }
+        
+        System.out.println("\n=== DECODIFICAÇÃO ===");
+        System.out.println("Entrada: " + codigoMorse);
+        System.out.print("Palavra: ");
+        
+        StringBuilder resultado = new StringBuilder();
+        String[] codigos = codigoMorse.split(" ");
+        
+        for (String codigo : codigos) {
+            if (!codigo.trim().isEmpty()) {
+                char letra = getCharFromMorse(codigo.trim());
+                System.out.print(letra);
+                resultado.append(letra);
+            }
+        }
+        
+        System.out.println();
+        System.out.println("Resultado completo: " + resultado.toString());
+        System.out.println("Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+    
+    // Método auxiliar para obter caractere a partir do código morse
+    private static char getCharFromMorse(String morseCode) {
+        for (String[] entry : MORSE_TABLE) {
+            if (entry[1].equals(morseCode)) {
+                return entry[0].charAt(0);
+            }
+        }
+        return '?'; // Se não encontrar
     }
 }
