@@ -20,7 +20,7 @@ public class TreeVisualizerSwing extends JFrame {
         String morseCode;
         Node left;
         Node right;
-        boolean isHighlighted; // Para destacar o caminho percorrido
+        boolean isHighlighted;
 
         public Node(char letter, String morseCode) {
             this.letter = letter;

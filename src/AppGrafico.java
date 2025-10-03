@@ -19,7 +19,6 @@ public class AppGrafico {
     public static void main(String[] args) {
         System.out.println("=== ÁRVORE BINÁRIA DE CÓDIGO MORSE ===");
         System.out.println("Regras: Ponto (.) → Esquerda | Traço (-) → Direita");
-        System.out.println("Com visualização gráfica do caminho percorrido!");
         System.out.println("======================================\n");
 
         boolean running = true;
@@ -288,7 +287,7 @@ public class AppGrafico {
    
         System.out.println("• Só mostra códigos de letras JÁ INSERIDAS na árvore");
         System.out.println("• '?' indica letras não inseridas ainda");
-        
+
         
         System.out.println("Pressione Enter para continuar...");
         scanner.nextLine();
