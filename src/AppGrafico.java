@@ -28,9 +28,10 @@ public class AppGrafico {
             System.out.println("\n--- MENU PRINCIPAL ---");
             System.out.println("1. Inserir caractere");
             System.out.println("2. Mostrar árvore (interface gráfica)");
-            System.out.println("3. Codificar palavra");
-            System.out.println("4. Decodificar código morse");
-            System.out.println("5. Sair");
+            System.out.println("3. Buscar caractere por profundidade");
+            System.out.println("4. Codificar palavra");
+            System.out.println("5. Decodificar código morse");
+            System.out.println("6. Sair");
             System.out.print("Escolha uma opção: ");
 
             int opcao = scanner.nextInt();
@@ -44,12 +45,15 @@ public class AppGrafico {
                     mostrarArvore();
                     break;
                 case 3:
-                    System.out.println("Funcionalidade ainda não implementada!");
+                    buscarCaractere();
                     break;
                 case 4:
                     System.out.println("Funcionalidade ainda não implementada!");
                     break;
                 case 5:
+                    System.out.println("Funcionalidade ainda não implementada!");
+                    break;
+                case 6:
                     running = false;
                     System.out.println("Saindo...");
                     break;
@@ -117,6 +121,57 @@ public class AppGrafico {
         
         System.out.println("\n🌳 Abrindo visualização gráfica da árvore...");
         TreeVisualizerSwing.showTree(morseBST);
+        
+        System.out.println("Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+    
+    private static void buscarCaractere() {
+        if (morseBST.getRoot() == null) {
+            System.out.println("\nÁRVORE VAZIA!");
+            System.out.println("Insira alguns caracteres primeiro usando a opção 1.");
+            System.out.println("Pressione Enter para continuar...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.print("Digite o caractere a ser buscado (A-Z, 0-9): ");
+        String input = scanner.nextLine().toUpperCase();
+        
+        if (input.length() != 1) {
+            System.out.println("Por favor, digite apenas um caractere!");
+            return;
+        }
+        
+        char caractere = input.charAt(0);
+        String morseCode = getMorseCode(caractere);
+        
+        if (morseCode == null) {
+            System.out.println("Caractere não suportado! Use apenas A-Z ou 0-9.");
+            return;
+        }
+        
+        System.out.println("\n=== BUSCA EM PROFUNDIDADE ===");
+        System.out.println("Letra: " + caractere);
+        System.out.println("Código Morse: " + morseCode);
+        System.out.println();
+        
+        // Buscar na árvore (mostrará o caminho no console)
+        TreeVisualizerSwing.Node resultado = morseBST.search(caractere);
+        
+        if (resultado != null) {
+            int profundidade = morseBST.getDepth(caractere);
+            System.out.println("\n✅ CARACTERE ENCONTRADO!");
+            System.out.println("📏 Profundidade do nó: " + profundidade);
+            System.out.println("📍 Definição: A profundidade é o número de arestas entre o nó e a raiz");
+            
+            // Mostrar visualização gráfica
+            System.out.println("\nAbrindo visualização gráfica do caminho de busca...");
+            TreeVisualizerSwing.showTree(morseBST);
+        } else {
+            System.out.println("\n❌ CARACTERE NÃO ENCONTRADO!");
+            System.out.println("O caractere '" + caractere + "' não foi inserido na árvore ainda.");
+        }
         
         System.out.println("Pressione Enter para continuar...");
         scanner.nextLine();
