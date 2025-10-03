@@ -28,8 +28,8 @@ java -cp bin AppGrafico
 
 1. **Inserir caractere** - Adiciona uma letra (A-Z, 0-9) na árvore
 2. **Mostrar árvore** - Abre interface gráfica com visualização
-3. **Codificar palavra** - (Em desenvolvimento)
-4. **Decodificar código morse** - (Em desenvolvimento)
+3. **Codificar palavra** 
+4. **Decodificar código morse**
 5. **Sair** - Encerra o programa
 
 ## Requisitos de Implementação (TDE 2)
