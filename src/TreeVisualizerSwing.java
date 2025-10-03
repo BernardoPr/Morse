@@ -2,8 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
+import Estrutura.ArrayListCustom;
+import Estrutura.ListInterface;
 
 public class TreeVisualizerSwing extends JFrame {
     private static final int WINDOW_WIDTH = 1000;
@@ -11,7 +11,7 @@ public class TreeVisualizerSwing extends JFrame {
     private static final int NODE_RADIUS = 25;
     
     private MorseBST bst;
-    private List<String> lastPath;
+    private ListInterface<String> lastPath;
     private TreePanel treePanel;
     
     // Classe Node para a árvore binária de busca
@@ -34,11 +34,11 @@ public class TreeVisualizerSwing extends JFrame {
     // Classe da árvore binária de busca
     static class MorseBST {
         private Node root;
-        private List<String> insertionPath;
+        private ListInterface<String> insertionPath;
 
         public MorseBST() {
             this.root = null;
-            this.insertionPath = new ArrayList<>();
+            this.insertionPath = new ArrayListCustom<>();
         }
 
         public void insert(char letter, String morseCode) {
@@ -75,26 +75,28 @@ public class TreeVisualizerSwing extends JFrame {
                 // Ponto vai para a esquerda
                 System.out.println("Seguindo caminho esquerda (.) - " + path + ".");
                 current.left = insertRecursive(current.left, letter, morseCode, remaining, path + ".");
-            } else if (currentChar == '-') {
-                // Traço vai para a direita  
-                System.out.println("Seguindo caminho direita (-) - " + path + "-");
-                current.right = insertRecursive(current.right, letter, morseCode, remaining, path + "-");
+            } else if (currentChar == '-' || currentChar == '_') {
+                // Traço ou underscore vai para a direita  
+                String symbol = (currentChar == '_') ? "_" : "-";
+                System.out.println("Seguindo caminho direita (" + symbol + ") - " + path + symbol);
+                current.right = insertRecursive(current.right, letter, morseCode, remaining, path + symbol);
             }
 
             return current;
         }
         
-        public List<String> getLastInsertionPath() {
-            return new ArrayList<>(insertionPath);
+        public ListInterface<String> getLastInsertionPath() {
+            return new ArrayListCustom<>(insertionPath);
         }
         
         public Node getRoot() {
             return root;
         }
         
-        public void highlightPath(List<String> path) {
+        public void highlightPath(ListInterface<String> path) {
             clearHighlights(root);
-            for (String pathStr : path) {
+            for (int i = 0; i < path.size(); i++) {
+                String pathStr = path.get(i);
                 highlightNodeAtPath(root, pathStr, "");
             }
         }
@@ -118,21 +120,33 @@ public class TreeVisualizerSwing extends JFrame {
                     char nextChar = targetPath.charAt(currentPath.length());
                     if (nextChar == '.') {
                         highlightNodeAtPath(node.left, targetPath, currentPath + ".");
-                    } else if (nextChar == '-') {
-                        highlightNodeAtPath(node.right, targetPath, currentPath + "-");
+                    } else if (nextChar == '-' || nextChar == '_') {
+                        String symbol = (nextChar == '_') ? "_" : "-";
+                        highlightNodeAtPath(node.right, targetPath, currentPath + symbol);
                     }
                 }
             }
         }
         
         // Método para buscar um caractere na árvore seguindo o código morse
-        public Node search(char character) {
-            String morseCode = getMorseCodeForChar(character);
+        public Node search(char character, String morseCode) {
             if (morseCode == null) {
                 return null;
             }
             
             System.out.println("Buscando caractere '" + character + "' com código morse: " + morseCode);
+            insertionPath.clear(); // Reutilizar para mostrar o caminho de busca
+            
+            return searchRecursive(root, morseCode, "");
+        }
+        
+        // Método sobrecarregado para buscar apenas pelo código morse
+        public Node search(String morseCode) {
+            if (morseCode == null) {
+                return null;
+            }
+            
+            System.out.println("Buscando pelo código morse: " + morseCode);
             insertionPath.clear(); // Reutilizar para mostrar o caminho de busca
             
             return searchRecursive(root, morseCode, "");
@@ -167,39 +181,19 @@ public class TreeVisualizerSwing extends JFrame {
                 // Ponto vai para a esquerda
                 System.out.println("Seguindo caminho esquerda (.) - " + path + ".");
                 return searchRecursive(current.left, remaining, path + ".");
-            } else if (currentChar == '-') {
-                // Traço vai para a direita
-                System.out.println("Seguindo caminho direita (-) - " + path + "-");
-                return searchRecursive(current.right, remaining, path + "-");
+            } else if (currentChar == '-' || currentChar == '_') {
+                // Traço ou underscore vai para a direita
+                String symbol = (currentChar == '_') ? "_" : "-";
+                System.out.println("Seguindo caminho direita (" + symbol + ") - " + path + symbol);
+                return searchRecursive(current.right, remaining, path + symbol);
             }
             
             return null;
         }
         
-        // Método auxiliar para obter código morse de um caractere
-        private String getMorseCodeForChar(char character) {
-            String[][] morseTable = {
-                {"A", ".-"}, {"B", "-..."}, {"C", "-.-."}, {"D", "-.."}, {"E", "."},
-                {"F", "..-."}, {"G", "--."}, {"H", "...."}, {"I", ".."}, {"J", ".---"},
-                {"K", "-.-"}, {"L", ".-.."}, {"M", "--"}, {"N", "-."}, {"O", "---"},
-                {"P", ".--."}, {"Q", "--.-"}, {"R", ".-."}, {"S", "..."}, {"T", "-"},
-                {"U", "..-"}, {"V", "...-"}, {"W", ".--"}, {"X", "-..-"}, {"Y", "-.--"},
-                {"Z", "--.."}, {"0", "-----"}, {"1", ".----"}, {"2", "..---"}, 
-                {"3", "...--"}, {"4", "....-"}, {"5", "....."}, {"6", "-...."}, 
-                {"7", "--..."}, {"8", "---.."}, {"9", "----."}
-            };
-            
-            for (String[] entry : morseTable) {
-                if (entry[0].charAt(0) == character) {
-                    return entry[1];
-                }
-            }
-            return null;
-        }
         
         // Método para calcular a profundidade de um caractere
-        public int getDepth(char character) {
-            String morseCode = getMorseCodeForChar(character);
+        public int getDepth(char character, String morseCode) {
             if (morseCode == null) {
                 return -1; // Caractere não suportado
             }
@@ -235,6 +229,172 @@ public class TreeVisualizerSwing extends JFrame {
             }
             
             return -1;
+        }
+        
+        // Método para codificar palavra usando recursão na árvore
+        public String encodeWordRecursive(String word) {
+            if (word == null || word.trim().isEmpty()) {
+                return "";
+            }
+            
+            System.out.println("=== CODIFICAÇÃO RECURSIVA ===");
+            System.out.println("Palavra: \"" + word + "\"");
+            System.out.println("Buscando cada letra NA ÁRVORE recursivamente...");
+            System.out.println();
+            
+            String result = encodeStringRecursive(word.toUpperCase().trim(), 0);
+            System.out.println("Resultado final: \"" + result.trim() + "\"");
+            return result.trim();
+        }
+        
+        private String encodeStringRecursive(String word, int index) {
+            // Caso base: se chegou ao fim da palavra
+            if (index >= word.length()) {
+                return "";
+            }
+            
+            char currentChar = word.charAt(index);
+            String morse = "";
+            
+            if (currentChar == ' ') {
+                morse = "   "; // 3 espaços para separar palavras
+                System.out.println("Espaço → '   ' (separador de palavras)");
+            } else {
+                // Buscar recursivamente na árvore o código morse desta letra
+                morse = findMorseInTreeRecursive(root, currentChar, "");
+                if (morse != null) {
+                    System.out.println("'" + currentChar + "' → '" + morse + "' (encontrado na árvore)");
+                } else {
+                    morse = "?";
+                    System.out.println("'" + currentChar + "' → '?' (NÃO encontrado na árvore)");
+                }
+            }
+            
+            // Chamada recursiva para o próximo caractere
+            String restOfWord = encodeStringRecursive(word, index + 1);
+            
+            // Adicionar espaço entre códigos morse (exceto no final)
+            if (!restOfWord.isEmpty() && !morse.equals("   ") && !restOfWord.startsWith("   ")) {
+                morse += " ";
+            }
+            
+            return morse + restOfWord;
+        }
+        
+        // Busca recursiva na árvore para encontrar o código morse de uma letra
+        private String findMorseInTreeRecursive(Node node, char targetChar, String currentPath) {
+            // Caso base: nó null
+            if (node == null) {
+                return null;
+            }
+            
+            // Caso base: encontrou a letra
+            if (node.letter == targetChar) {
+                return currentPath;
+            }
+            
+            // Busca recursiva na subárvore esquerda (ponto)
+            String leftResult = findMorseInTreeRecursive(node.left, targetChar, currentPath + ".");
+            if (leftResult != null) {
+                return leftResult;
+            }
+            
+            // Busca recursiva na subárvore direita (traço)
+            String rightResult = findMorseInTreeRecursive(node.right, targetChar, currentPath + "-");
+            if (rightResult != null) {
+                return rightResult;
+            }
+            
+            return null; // Não encontrou
+        }
+        
+        // Método para decodificar código morse usando recursão na árvore
+        public String decodeMessageRecursive(String morseMessage) {
+            if (morseMessage == null || morseMessage.trim().isEmpty()) {
+                return "";
+            }
+            
+            System.out.println("=== DECODIFICAÇÃO RECURSIVA ===");
+            System.out.println("Código morse: \"" + morseMessage + "\"");
+            System.out.println("Navegando NA ÁRVORE recursivamente...");
+            System.out.println();
+            
+            String result = decodeStringRecursive(morseMessage.trim(), 0);
+            System.out.println("Resultado final: \"" + result + "\"");
+            return result;
+        }
+        
+        private String decodeStringRecursive(String morseCode, int startIndex) {
+            // Caso base: se chegou ao fim do código morse
+            if (startIndex >= morseCode.length()) {
+                return "";
+            }
+            
+            // Pular espaços múltiplos (separadores de palavra)
+            while (startIndex < morseCode.length() && morseCode.charAt(startIndex) == ' ') {
+                startIndex++;
+                // Se encontrou 3 ou mais espaços, adiciona separador de palavra
+                if (startIndex < morseCode.length() && morseCode.charAt(startIndex) == ' ') {
+                    // Pular todos os espaços extras
+                    while (startIndex < morseCode.length() && morseCode.charAt(startIndex) == ' ') {
+                        startIndex++;
+                    }
+                    // Chamada recursiva para o resto + espaço de palavra
+                    return " " + decodeStringRecursive(morseCode, startIndex);
+                }
+            }
+            
+            // Encontrar o próximo código morse (até o próximo espaço)
+            int endIndex = startIndex;
+            while (endIndex < morseCode.length() && morseCode.charAt(endIndex) != ' ') {
+                endIndex++;
+            }
+            
+            if (startIndex >= morseCode.length()) {
+                return "";
+            }
+            
+            // Extrair o código morse individual
+            String singleMorse = morseCode.substring(startIndex, endIndex);
+            
+            // Decodificar este código morse navegando na árvore
+            char decodedChar = decodeSingleMorseRecursive(root, singleMorse, 0);
+            
+            if (decodedChar != '?') {
+                System.out.println("'" + singleMorse + "' → '" + decodedChar + "' (encontrado na árvore)");
+            } else {
+                System.out.println("'" + singleMorse + "' → '?' (NÃO encontrado na árvore)");
+            }
+            
+            // Chamada recursiva para o resto da string
+            return decodedChar + decodeStringRecursive(morseCode, endIndex);
+        }
+        
+        // Navega recursivamente na árvore seguindo o código morse
+        private char decodeSingleMorseRecursive(Node node, String morseCode, int index) {
+            // Caso base: nó null
+            if (node == null) {
+                return '?';
+            }
+            
+            // Caso base: chegou ao fim do código morse
+            if (index >= morseCode.length()) {
+                // Se é um nó de letra (não intermediário), retorna a letra
+                return (node.letter != ' ') ? node.letter : '?';
+            }
+            
+            char currentChar = morseCode.charAt(index);
+            
+            if (currentChar == '.') {
+                // Ponto: vai para a esquerda
+                return decodeSingleMorseRecursive(node.left, morseCode, index + 1);
+            } else if (currentChar == '-') {
+                // Traço: vai para a direita
+                return decodeSingleMorseRecursive(node.right, morseCode, index + 1);
+            } else {
+                // Caractere inválido
+                return '?';
+            }
         }
     }
     
@@ -328,9 +488,9 @@ public class TreeVisualizerSwing extends JFrame {
 
     public TreeVisualizerSwing(MorseBST bst) {
         this.bst = bst;
-        this.lastPath = new ArrayList<>();
+        this.lastPath = new ArrayListCustom<>();
         
-        setTitle("Visualizador de Árvore Morse - Caminho: " + (lastPath.isEmpty() ? "Nenhum" : String.join(" -> ", lastPath)));
+        setTitle("Visualizador de Árvore Morse - Caminho: " + (lastPath.isEmpty() ? "Nenhum" : ((ArrayListCustom<String>)lastPath).join(" -> ")));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setLocationRelativeTo(null);
@@ -339,7 +499,7 @@ public class TreeVisualizerSwing extends JFrame {
         
         // Mostrar o caminho da última inserção
         if (bst != null) {
-            List<String> path = bst.getLastInsertionPath();
+            ListInterface<String> path = bst.getLastInsertionPath();
             if (!path.isEmpty()) {
                 showInsertionPath(path);
             }
@@ -362,7 +522,7 @@ public class TreeVisualizerSwing extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (bst != null) {
-                    List<String> path = bst.getLastInsertionPath();
+                    ListInterface<String> path = bst.getLastInsertionPath();
                     showInsertionPath(path);
                 }
             }
@@ -385,11 +545,11 @@ public class TreeVisualizerSwing extends JFrame {
         add(controlPanel, BorderLayout.SOUTH);
     }
     
-    private void showInsertionPath(List<String> path) {
+    private void showInsertionPath(ListInterface<String> path) {
         if (bst == null || path.isEmpty()) return;
         
-        this.lastPath = new ArrayList<>(path);
-        setTitle("Visualizador de Árvore Morse - Último Caminho: " + String.join(" -> ", path));
+        this.lastPath = new ArrayListCustom<>(path);
+        setTitle("Visualizador de Árvore Morse - Último Caminho: " + ((ArrayListCustom<String>)path).join(" -> "));
         
         // Destacar o caminho
         bst.highlightPath(path);
@@ -405,7 +565,9 @@ public class TreeVisualizerSwing extends JFrame {
                 if (currentStep < path.size()) {
                     bst.clearHighlights(bst.getRoot());
                     for (int i = 0; i <= currentStep; i++) {
-                        bst.highlightPath(List.of(path.get(i)));
+                        ArrayListCustom<String> singlePath = new ArrayListCustom<>();
+                        singlePath.add(path.get(i));
+                        bst.highlightPath(singlePath);
                     }
                     treePanel.repaint();
                     currentStep++;

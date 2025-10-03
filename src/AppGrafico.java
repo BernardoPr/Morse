@@ -5,16 +5,15 @@ public class AppGrafico {
     private static TreeVisualizerSwing.MorseBST morseBST = new TreeVisualizerSwing.MorseBST();
     private static Scanner scanner = new Scanner(System.in);
     
-    // Mapa com o código morse de cada letra
+    // Tabela de códigos morse padrão para inserção automática
     private static final String[][] MORSE_TABLE = {
         {"A", ".-"}, {"B", "-..."}, {"C", "-.-."}, {"D", "-.."}, {"E", "."},
         {"F", "..-."}, {"G", "--."}, {"H", "...."}, {"I", ".."}, {"J", ".---"},
         {"K", "-.-"}, {"L", ".-.."}, {"M", "--"}, {"N", "-."}, {"O", "---"},
         {"P", ".--."}, {"Q", "--.-"}, {"R", ".-."}, {"S", "..."}, {"T", "-"},
-        {"U", "..-"}, {"V", "...-"}, {"W", ".--"}, {"X", "-..-"}, {"Y", "-.--"},
-        {"Z", "--.."}, {"0", "-----"}, {"1", ".----"}, {"2", "..---"}, 
-        {"3", "...--"}, {"4", "....-"}, {"5", "....."}, {"6", "-...."}, 
-        {"7", "--..."}, {"8", "---.."}, {"9", "----."}
+        {"U", "..-"}, {"V", "...-"}, {"W", ".--"}, {"X", "-..-"}, {"Y", "-.--"}, {"Z", "--.."},
+        {"0", "-----"}, {"1", ".----"}, {"2", "..---"}, {"3", "...--"}, {"4", "....-"},
+        {"5", "....."}, {"6", "-...."}, {"7", "--..."}, {"8", "---.."}, {"9", "----."}
     };
 
     public static void main(String[] args) {
@@ -67,8 +66,25 @@ public class AppGrafico {
     }
 
     private static void inserirCaractere() {
+        System.out.println("\n--- INSERÇÃO DE CARACTERE ---");
+        System.out.println("1. Inserção automática (código padrão)");
+        System.out.println("2. Inserção personalizada (código customizado)");
+        System.out.print("Escolha uma opção: ");
+        
+        String opcao = scanner.nextLine().trim();
+        
+        if (opcao.equals("1")) {
+            inserirAutomatico();
+        } else if (opcao.equals("2")) {
+            inserirPersonalizado();
+        } else {
+            System.out.println("Opção inválida!");
+        }
+    }
+    
+    private static void inserirAutomatico() {
         System.out.print("Digite o caractere a ser inserido (A-Z, 0-9): ");
-        String input = scanner.nextLine().toUpperCase();
+        String input = scanner.nextLine().toUpperCase().trim();
         
         if (input.length() != 1) {
             System.out.println("Por favor, digite apenas um caractere!");
@@ -79,21 +95,30 @@ public class AppGrafico {
         String morseCode = getMorseCode(caractere);
         
         if (morseCode == null) {
-            System.out.println("Caractere não suportado! Use apenas A-Z ou 0-9.");
+            System.out.println("Caractere não encontrado na tabela padrão!");
+            System.out.println("Use a inserção personalizada (opção 2) para códigos customizados.");
             return;
         }
         
-        System.out.println("\n=== INSERÇÃO ===");
+        // Verificar se a posição já está ocupada
+        if (posicaoOcupada(morseCode)) {
+            TreeVisualizerSwing.Node existente = morseBST.search(morseCode);
+            System.out.println("\nPOSIÇÃO OCUPADA!");
+            System.out.println("Já existe o caractere '" + existente.letter + "' no código morse '" + morseCode + "'");
+            System.out.println("Não é possível inserir '" + caractere + "' na mesma posição.");
+            System.out.println("Pressione Enter para continuar...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println("\n=== INSERÇÃO AUTOMÁTICA ===");
         System.out.println("Letra: " + caractere);
-        System.out.println("Código Morse: " + morseCode);
+        System.out.println("Código Morse: " + morseCode + " (padrão)");
         System.out.println();
         
-        // Inserir na árvore (mostrará o caminho no console)
         morseBST.insert(caractere, morseCode);
         
         System.out.println("\nCaractere inserido com sucesso!");
-        
-        // Automaticamente mostrar a árvore gráfica após inserção
         System.out.println("Abrindo visualização gráfica...");
         TreeVisualizerSwing.showTree(morseBST);
         
@@ -101,6 +126,58 @@ public class AppGrafico {
         scanner.nextLine();
     }
     
+    private static void inserirPersonalizado() {
+        System.out.print("Digite o caractere a ser inserido: ");
+        String input = scanner.nextLine().toUpperCase().trim();
+        
+        if (input.length() != 1) {
+            System.out.println("Por favor, digite apenas um caractere!");
+            return;
+        }
+        
+        char caractere = input.charAt(0);
+        
+        System.out.print("Digite o código morse personalizado (ex: .-_ ): ");
+        String morseCode = scanner.nextLine().trim();
+        
+        if (morseCode.isEmpty()) {
+            System.out.println("Por favor, digite um código morse válido!");
+            return;
+        }
+        
+        // Validar que o código morse contém apenas pontos, traços e underscores
+        if (!morseCode.matches("[._-]+")) {
+            System.out.println("Código morse deve conter apenas pontos (.), traços (-) e underscores (_)!");
+            return;
+        }
+        
+        // Verificar se a posição já está ocupada
+        if (posicaoOcupada(morseCode)) {
+            TreeVisualizerSwing.Node existente = morseBST.search(morseCode);
+            System.out.println("\nPOSIÇÃO OCUPADA!");
+            System.out.println("Já existe o caractere '" + existente.letter + "' no código morse '" + morseCode + "'");
+            System.out.println("Escolha um código morse diferente.");
+            System.out.println("Pressione Enter para continuar...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println("\n=== INSERÇÃO PERSONALIZADA ===");
+        System.out.println("Letra: " + caractere);
+        System.out.println("Código Morse: " + morseCode + " (personalizado)");
+        System.out.println();
+        
+        morseBST.insert(caractere, morseCode);
+        
+        System.out.println("\nCaractere inserido com sucesso!");
+        System.out.println("Abrindo visualização gráfica...");
+        TreeVisualizerSwing.showTree(morseBST);
+        
+        System.out.println("Pressione Enter para continuar...");
+        scanner.nextLine();
+    }
+    
+    // Método para obter código morse da tabela padrão
     private static String getMorseCode(char character) {
         for (String[] entry : MORSE_TABLE) {
             if (entry[0].charAt(0) == character) {
@@ -110,16 +187,24 @@ public class AppGrafico {
         return null;
     }
     
+    // Método para verificar se uma posição na árvore já está ocupada
+    private static boolean posicaoOcupada(String morseCode) {
+        TreeVisualizerSwing.Node node = morseBST.search(morseCode);
+        return node != null && node.letter != ' ';
+    }
+    
+
+    
     private static void mostrarArvore() {
         if (morseBST.getRoot() == null) {
-            System.out.println("\n⚠️  ÁRVORE VAZIA!");
+            System.out.println("\nÁRVORE VAZIA!");
             System.out.println("Insira alguns caracteres primeiro usando a opção 1.");
             System.out.println("Pressione Enter para continuar...");
             scanner.nextLine();
             return;
         }
         
-        System.out.println("\n🌳 Abrindo visualização gráfica da árvore...");
+        System.out.println("\nAbrindo visualização gráfica da árvore...");
         TreeVisualizerSwing.showTree(morseBST);
         
         System.out.println("Pressione Enter para continuar...");
@@ -135,42 +220,40 @@ public class AppGrafico {
             return;
         }
         
-        System.out.print("Digite o caractere a ser buscado (A-Z, 0-9): ");
-        String input = scanner.nextLine().toUpperCase();
+        System.out.print("Digite o código morse a ser buscado (ex: .- para A): ");
+        String morseCode = scanner.nextLine().trim();
         
-        if (input.length() != 1) {
-            System.out.println("Por favor, digite apenas um caractere!");
+        if (morseCode.isEmpty()) {
+            System.out.println("Por favor, digite um código morse válido!");
             return;
         }
         
-        char caractere = input.charAt(0);
-        String morseCode = getMorseCode(caractere);
-        
-        if (morseCode == null) {
-            System.out.println("Caractere não suportado! Use apenas A-Z ou 0-9.");
+        // Validar que o código morse contém apenas pontos e traços
+        if (!morseCode.matches("[.-]+")) {
+            System.out.println("Código morse deve conter apenas pontos (.) e traços (-)!");
             return;
         }
         
         System.out.println("\n=== BUSCA EM PROFUNDIDADE ===");
-        System.out.println("Letra: " + caractere);
         System.out.println("Código Morse: " + morseCode);
         System.out.println();
         
         // Buscar na árvore (mostrará o caminho no console)
-        TreeVisualizerSwing.Node resultado = morseBST.search(caractere);
+        TreeVisualizerSwing.Node resultado = morseBST.search(morseCode);
         
         if (resultado != null) {
-            int profundidade = morseBST.getDepth(caractere);
-            System.out.println("\n✅ CARACTERE ENCONTRADO!");
-            System.out.println("📏 Profundidade do nó: " + profundidade);
-            System.out.println("📍 Definição: A profundidade é o número de arestas entre o nó e a raiz");
+            int profundidade = morseBST.getDepth(resultado.letter, morseCode);
+            System.out.println("\nCÓDIGO ENCONTRADO!");
+            System.out.println("Letra: " + resultado.letter);
+            System.out.println("Profundidade do nó: " + profundidade);
+            System.out.println("Definição: A profundidade é o número de arestas entre o nó e a raiz");
             
             // Mostrar visualização gráfica
             System.out.println("\nAbrindo visualização gráfica do caminho de busca...");
             TreeVisualizerSwing.showTree(morseBST);
         } else {
-            System.out.println("\n❌ CARACTERE NÃO ENCONTRADO!");
-            System.out.println("O caractere '" + caractere + "' não foi inserido na árvore ainda.");
+            System.out.println("\nCÓDIGO NÃO ENCONTRADO!");
+            System.out.println("O código morse '" + morseCode + "' não foi inserido na árvore ainda.");
         }
         
         System.out.println("Pressione Enter para continuar...");
@@ -178,46 +261,48 @@ public class AppGrafico {
     }
     
     private static void codificarPalavra() {
+        if (morseBST.getRoot() == null) {
+            System.out.println("\nÁRVORE VAZIA!");
+            System.out.println("Insira alguns caracteres primeiro usando a opção 1.");
+            System.out.println("Pressione Enter para continuar...");
+            scanner.nextLine();
+            return;
+        }
+        
         System.out.print("Digite a palavra para codificar (ex: JK): ");
-        String palavra = scanner.nextLine().toUpperCase();
+        String palavra = scanner.nextLine();
         
         if (palavra.trim().isEmpty()) {
             System.out.println("Por favor, digite uma palavra válida!");
             return;
         }
         
-        System.out.println("\n=== CODIFICAÇÃO ===");
-        System.out.println("Entrada: " + palavra);
-        System.out.print("Código Morse: ");
-        
-        StringBuilder resultado = new StringBuilder();
-        
-        for (int i = 0; i < palavra.length(); i++) {
-            char letra = palavra.charAt(i);
-            String morse = getMorseCode(letra);
-            
-            if (morse != null) {
-                resultado.append(morse);
-                if (i < palavra.length() - 1) {
-                    resultado.append(" ");
-                }
-                System.out.print(morse);
-                if (i < palavra.length() - 1) {
-                    System.out.print(" ");
-                }
-            } else {
-                System.out.print("?");
-                resultado.append("?");
-            }
-        }
-        
         System.out.println();
-        System.out.println("Resultado completo: " + resultado.toString());
+        
+        // Usar codificação recursiva na árvore (não na tabela)
+        String resultado = morseBST.encodeWordRecursive(palavra);
+        
+        System.out.println("\nRESULTADO DA CODIFICAÇÃO:");
+        System.out.println("Palavra original: \"" + palavra + "\"");
+        System.out.println("Código morse: \"" + resultado + "\"");
+   
+        System.out.println("• Só mostra códigos de letras JÁ INSERIDAS na árvore");
+        System.out.println("• '?' indica letras não inseridas ainda");
+        
+        
         System.out.println("Pressione Enter para continuar...");
         scanner.nextLine();
     }
     
     private static void decodificarMorse() {
+        if (morseBST.getRoot() == null) {
+            System.out.println("\nÁRVORE VAZIA!");
+            System.out.println("Insira alguns caracteres primeiro usando a opção 1.");
+            System.out.println("Pressione Enter para continuar...");
+            scanner.nextLine();
+            return;
+        }
+        
         System.out.println("Digite o código morse para decodificar:");
         System.out.println("(Separe cada código por espaço, ex: .--- -.- )");
         System.out.print("Código: ");
@@ -228,34 +313,19 @@ public class AppGrafico {
             return;
         }
         
-        System.out.println("\n=== DECODIFICAÇÃO ===");
-        System.out.println("Entrada: " + codigoMorse);
-        System.out.print("Palavra: ");
-        
-        StringBuilder resultado = new StringBuilder();
-        String[] codigos = codigoMorse.split(" ");
-        
-        for (String codigo : codigos) {
-            if (!codigo.trim().isEmpty()) {
-                char letra = getCharFromMorse(codigo.trim());
-                System.out.print(letra);
-                resultado.append(letra);
-            }
-        }
-        
         System.out.println();
-        System.out.println("Resultado completo: " + resultado.toString());
+        
+        // Usar decodificação recursiva na árvore (não na tabela)
+        String resultado = morseBST.decodeMessageRecursive(codigoMorse);
+        
+        System.out.println("\nRESULTADO DA DECODIFICAÇÃO:");
+        System.out.println("Código morse: \"" + codigoMorse + "\"");
+        System.out.println("Palavra decodificada: \"" + resultado + "\"");
+        
+        System.out.println("• Só decodifica letras JÁ INSERIDAS na árvore");
+        System.out.println("• '?' indica códigos não encontrados na árvore");
+        
         System.out.println("Pressione Enter para continuar...");
         scanner.nextLine();
-    }
-    
-    // Método auxiliar para obter caractere a partir do código morse
-    private static char getCharFromMorse(String morseCode) {
-        for (String[] entry : MORSE_TABLE) {
-            if (entry[1].equals(morseCode)) {
-                return entry[0].charAt(0);
-            }
-        }
-        return '?'; // Se não encontrar
     }
 }
