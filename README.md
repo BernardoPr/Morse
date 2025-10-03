@@ -1,32 +1,60 @@
-Entrega do TDE 2 - Código Morse 
+# Morse - Árvore Binária de Código Morse
 
-Implemente uma Árvore Binária de Busca com base nas regras do código morse: ponto para a esquerda e traço para a direita.
+## Descrição
 
-Ao iniciar, o programa deve exibir um menu com as seguintes opções: inserir, codificar e decodificar.
+Implementação de uma Árvore Binária de Busca com base nas regras do código morse: ponto para a esquerda e traço para a direita.
 
-Realize os tratamentos de erro necessários como: só é possível buscar, codificar ou decodificar caso a árvore não esteja vazia. Só é possível codificar ou decodificar strings válidas. Ou qualquer outro que ache pertinente.
+## Funcionalidades Implementadas ✅
 
-Todo o processo deve ser feito de forma dinâmica, ou seja, durante a execução do programa.
+- 🌳 **Inserção de caracteres** seguindo heurística do código morse (ponto à esquerda, traço à direita)
+- 🎨 **Visualização gráfica** da árvore com interface Swing
+- 🎯 **Caminho percorrido** destacado visualmente durante inserção
+- 🟡 **Nós visitados** em amarelo, **não visitados** em cinza opaco
+- 🔵 **Código morse** exibido em azul abaixo de cada letra
+- ✨ **Animação** do percurso de inserção
+- 📋 **Menu interativo** no console
 
-O programa deve exibir a Árvore Binária de Busca construída em uma interface. Você pode escolher se prefere implementar todo o trabalho (menu, inputs e exibição) na interface, ou se prefere inserir uma opção no menu para exibir a árvore resultante.
+## Como Executar
 
-Não é permitido utilizar nenhuma estrutura pronta do Java. Não é permitido utilizar HashMap, mesmo que implementado por você. Trabalhos nestes termos não serão avaliados e terão nota 0 na avaliação.
+```bash
+# Compilar o projeto
+javac -d bin src/*.java
 
-O trabalho deve ser implementado realizando todas as operações com recursão, conforme visto em sala.
+# Executar o programa
+java -cp bin AppGrafico
+```
 
-Vídeo explicativo sobre implementação de ABB para código morse: TDE 2 - Listas Não-Lineares: Código MorseLinks para um site externo.
+## Menu Principal
 
-Código de base com a impressão da árvore pronta: TreeVisualizer.javaBaixar TreeVisualizer.java
+1. **Inserir caractere** - Adiciona uma letra (A-Z, 0-9) na árvore
+2. **Mostrar árvore** - Abre interface gráfica com visualização
+3. **Codificar palavra** - (Em desenvolvimento)
+4. **Decodificar código morse** - (Em desenvolvimento)
+5. **Sair** - Encerra o programa
 
-Documentação do JavaFX (Configuração necessária para funcionar): https://openjfx.io/openjfx-docs/Links para um site externo.
+## Requisitos de Implementação (TDE 2)
 
-O trabalho pode ser feito em duplas ou trios. Não serão considerados os envios individuais de estudantes que não tenham aprovação prévia da professora.
+- ✅ Inserção dos caracteres conforme heurística do código morse (1,5 pts)
+- 🔄 Busca em profundidade (1,5 pts) - *Em desenvolvimento*
+- 🔄 Decodificação de sequências (2,0 pts) - *Em desenvolvimento*  
+- 🔄 Codificação de sequências (2,0 pts) - *Em desenvolvimento*
+- ✅ Interface gráfica para impressão da árvore (1,5 pts)
+- ✅ Operações implementadas com recursão (1,5 pts)
 
-Requisitos de Implementação:
+## Estrutura do Projeto
 
-O código deve realizar a inserção dos caracteres conforme heurística do código morse (ponto à esquerda e traço à direita) - (1,5)
-O código deve realizar a busca em profundidade (ponto à esquerda e traço à direita) - (1,5)
-O código deve ser capaz de decodificar uma sequência de caracteres (palavra) fornecida por input pelo usuário e realizar a impressão da palavra decodificada (console ou interface) - (2,0)
-O código deve ser capaz de codificar uma sequência de caracteres (palavra) fornecida por input pelo usuário e realizar a impressão da palavra decodificada (console ou interface) - (2,0)
-O código deve imprimir a árvore resultante com interface gráfica. Esse item pode ser adaptado de uma implementação já realizada (internet ou IA) - (1,5)
-Todas as operações (inserção,  busca, codificação e decodificação) devem ser realizadas com recursividade, conforme visto em sala de aula. - (1,5)
+```
+src/
+├── AppGrafico.java           # Aplicação principal com menu
+└── TreeVisualizerSwing.java  # Visualizador gráfico da árvore
+```
+
+## Tecnologias
+
+- **Java** - Linguagem principal
+- **Swing** - Interface gráfica
+- **Git** - Controle de versão
+
+## Autor
+
+Desenvolvido como parte do TDE 2 - Listas Não-Lineares
